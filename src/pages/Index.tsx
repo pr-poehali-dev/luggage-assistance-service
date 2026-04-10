@@ -4,428 +4,558 @@ import Icon from "@/components/ui/icon";
 const HERO_IMAGE =
   "https://cdn.poehali.dev/projects/6038a985-0abf-4169-a538-8b944a6b2559/files/b577e154-54d0-4adb-b86d-1aa620e5bff3.jpg";
 
+const API_URL = "https://functions.poehali.dev/9001157e-c13b-430a-9b7b-45006fdec995";
+
+const STATIONS = [
+  "Москва Казанская",
+  "Москва Ярославская",
+  "Москва Павелецкая",
+  "Москва Курская",
+  "Москва Белорусская",
+  "Москва Киевская",
+  "Санкт-Петербург Главный",
+  "Санкт-Петербург Витебский",
+];
+
 const STEPS = [
   {
     num: "01",
-    title: "Оформление заявки",
-    desc: "Вы указываете только необходимую информацию",
+    icon: "FileText",
+    title: "Оставляете заявку",
+    desc: "Заполняете форму за 2 минуты. Никаких лишних полей — только то, что нужно.",
   },
   {
     num: "02",
-    title: "Оплата онлайн",
-    desc: "Простой и безопасный процесс",
+    icon: "CreditCard",
+    title: "Оплачиваете онлайн",
+    desc: "Безопасная оплата картой. Фиксированная цена — никаких доплат на месте.",
   },
   {
     num: "03",
-    title: "Назначение специалиста",
-    desc: "Без дополнительных подтверждений",
+    icon: "UserCheck",
+    title: "Назначаем носильщика",
+    desc: "Мгновенно и автоматически. Без звонков и подтверждений с вашей стороны.",
   },
   {
     num: "04",
-    title: "Персональная встреча",
-    desc: "Сотрудник встречает вас у вагона",
+    icon: "MessageSquare",
+    title: "Получаете SMS",
+    desc: "Имя и фото специалиста приходят на телефон. Вы знаете, кто вас встретит.",
   },
   {
     num: "05",
-    title: "Сопровождение багажа",
-    desc: "До автомобиля, зала ожидания или выхода",
+    icon: "Luggage",
+    title: "Встречаете носильщика у вагона",
+    desc: "Специалист ждёт именно у вашего вагона и сопровождает до выхода или автомобиля.",
   },
 ];
 
 const BENEFITS = [
   {
     icon: "Infinity",
-    title: "Любой объем багажа",
-    desc: "Без ограничений по весу и количеству мест",
+    title: "Нет ограничений по весу",
+    desc: "Любое количество мест, любой вес. Чемоданы, коробки, спортивный инвентарь — справимся.",
+    tag: "Без ограничений",
   },
   {
     icon: "Zap",
-    title: "Оформление в последний момент",
-    desc: "Доступно даже за 15 минут до прибытия",
-  },
-  {
-    icon: "CheckCircle",
-    title: "Без подтверждений",
-    desc: "Никаких лишних действий и согласований",
+    title: "Заявку не подтверждаем",
+    desc: "Вы оплатили — носильщик назначен. Мгновенно. Никаких ожиданий и обратных звонков.",
+    tag: "Мгновенно",
   },
   {
     icon: "RotateCcw",
-    title: "Гарантированный возврат",
-    desc: "В течение 15 минут при отмене",
+    title: "Полный возврат за 15 минут",
+    desc: "Решили отказаться? Деньги вернутся в полном объёме в течение 15 минут. Гарантированно.",
+    tag: "Гарантия",
+  },
+  {
+    icon: "Clock",
+    title: "Заявка за 15 минут до прибытия",
+    desc: "Поезд уже подъезжает? Не проблема — оформить заявку можно прямо сейчас.",
+    tag: "Срочно",
   },
 ];
 
-const AUDIENCES = [
-  { icon: "Briefcase", label: "Для деловых поездок" },
-  { icon: "Users", label: "Для путешествий с семьей" },
-  { icon: "Star", label: "Для тех, кто ценит комфорт" },
-  { icon: "Crown", label: "Для сервиса без компромиссов" },
-];
-
-const FAQS = [
-  {
-    q: "Что если мой поезд опаздывает?",
-    a: "Специалист отслеживает актуальное расписание и автоматически корректирует время прибытия.",
-  },
-  {
-    q: "Как происходит встреча?",
-    a: "После оплаты вы получите имя и фото специалиста. Он встретит вас непосредственно у вагона.",
-  },
-  {
-    q: "Можно отменить заказ?",
-    a: "Гарантированный возврат средств в течение 15 минут после отмены. Без вопросов и формальностей.",
-  },
-  {
-    q: "Какие вокзалы обслуживаются?",
-    a: "Все крупные вокзалы Москвы и Санкт-Петербурга. Список расширяется.",
-  },
+const TRUST_ITEMS = [
+  { icon: "ShieldCheck", text: "Соответствие стандартам РЖД" },
+  { icon: "Award", text: "Профессиональная подготовка персонала" },
+  { icon: "Lock", text: "Полная конфиденциальность" },
+  { icon: "Star", text: "Рейтинг 4.9 / 5 среди клиентов" },
 ];
 
 export default function Index() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    email: "",
+    train_number: "",
+    arrival_time: "",
+    station: "",
+    bags_count: "1",
+    notes: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const [orderId, setOrderId] = useState<number | null>(null);
 
   const scrollToForm = () => {
     document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return (
-    <div className="min-h-screen bg-[#F8F6F3] font-golos text-[#1A1A1A]">
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setError("");
+  };
 
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#F8F6F3]/95 backdrop-blur-md border-b border-[#E8E4DF]">
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.full_name || !form.phone || !form.station) {
+      setError("Заполните обязательные поля: ФИО, телефон и станцию.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, bags_count: parseInt(form.bags_count) }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSuccess(true);
+        setOrderId(data.order_id);
+      } else {
+        setError(data.error || "Ошибка при отправке. Попробуйте ещё раз.");
+      }
+    } catch {
+      setError("Ошибка сети. Проверьте интернет и повторите.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputCls =
+    "w-full bg-white border border-[#DDD8D0] rounded-lg px-4 py-3 text-[#1A1A1A] text-sm placeholder-[#AAA] focus:outline-none focus:border-[#E31E24] focus:ring-1 focus:ring-[#E31E24]/30 transition-all";
+  const labelCls =
+    "block text-xs font-semibold text-[#555] mb-1.5 uppercase tracking-wider";
+
+  return (
+    <div className="min-h-screen bg-[#F5F3EF] font-golos text-[#1A1A1A]">
+
+      {/* ═══ NAV ═══ */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-[#E31E24]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-[#D62B2B] rounded flex items-center justify-center">
-              <Icon name="Luggage" size={14} className="text-white" />
+            <div className="w-8 h-8 bg-[#E31E24] rounded flex items-center justify-center">
+              <span className="text-white font-black text-xs tracking-tight">РЖД</span>
             </div>
-            <span className="font-semibold text-base tracking-tight text-[#1A1A1A]">
-              РЖД<span className="text-[#D62B2B]"> Сопровождение</span>
+            <div className="w-px h-6 bg-[#DDD]" />
+            <span className="font-bold text-[15px] text-[#1A1A1A] tracking-tight">
+              Сервис сопровождения
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-[#666]">
-            <a href="#how" className="hover:text-[#D62B2B] transition-colors">Как работает</a>
-            <a href="#benefits" className="hover:text-[#D62B2B] transition-colors">Преимущества</a>
-            <a href="#faq" className="hover:text-[#D62B2B] transition-colors">Вопросы</a>
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#555]">
+            <a href="#how" className="hover:text-[#E31E24] transition-colors">Как работает</a>
+            <a href="#benefits" className="hover:text-[#E31E24] transition-colors">Преимущества</a>
+            <a href="#order-form" className="hover:text-[#E31E24] transition-colors">Заказать</a>
           </div>
+
           <button
             onClick={scrollToForm}
-            className="text-sm font-medium text-[#D62B2B] border border-[#D62B2B] px-4 py-2 rounded-lg hover:bg-[#D62B2B] hover:text-white transition-all duration-200"
+            className="bg-[#E31E24] hover:bg-[#C01A1F] text-white text-sm font-bold px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.02]"
           >
-            Заказать
+            Заказать носильщика
           </button>
         </div>
       </nav>
 
-      {/* HERO */}
+      {/* ═══ HERO ═══ */}
       <section className="relative min-h-screen flex flex-col justify-center pt-16 overflow-hidden">
-        {/* Фоновое изображение — тихое, затемнённое */}
         <div
-          className="absolute inset-0 bg-cover bg-center scale-105"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${HERO_IMAGE})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A]/75 via-[#1A1A1A]/60 to-[#1A1A1A]/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D]/92 via-[#0D0D0D]/75 to-[#0D0D0D]/30" />
+        <div className="absolute top-16 left-0 right-0 h-1 bg-[#E31E24] z-10" />
 
-        {/* Тонкая текстура поверх */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
+        <div className="relative z-10 max-w-6xl mx-auto px-6 py-24 w-full">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-[#E31E24] px-4 py-1.5 rounded mb-8">
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+              <span className="text-white text-xs font-bold uppercase tracking-[0.15em]">
+                Персональный сервис РЖД
+              </span>
+            </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 py-24 w-full">
-          {/* Верхний лейбл */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="h-px w-12 bg-[#D62B2B]" />
-            <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B] font-medium">
-              Персональный сервис
-            </span>
-          </div>
+            <h1 className="text-5xl md:text-[64px] font-black text-white leading-[1.0] tracking-tight mb-6">
+              Носильщик<br />
+              встретит вас<br />
+              <span className="text-[#E31E24]">у вагона</span>
+            </h1>
 
-          {/* Главный заголовок */}
-          <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 max-w-3xl">
-            Персональный<br />
-            <span className="text-[#D62B2B]">сервис</span><br />
-            сопровождения<br />
-            багажа
-          </h1>
-
-          <p className="text-xl md:text-2xl text-white/70 font-light mb-4 max-w-xl leading-relaxed">
-            Вы путешествуете —<br />мы заботимся об остальном
-          </p>
-
-          <p className="text-base text-white/50 mb-12 max-w-lg leading-relaxed">
-            Встреча у вагона и бережная доставка багажа без ограничений по весу
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-            <button
-              onClick={scrollToForm}
-              className="bg-[#D62B2B] hover:bg-[#b71c1c] text-white font-bold px-10 py-4 rounded-xl text-base tracking-wide transition-all duration-300 hover:scale-[1.03] shadow-[0_8px_32px_rgba(214,43,43,0.4)]"
-            >
-              Заказать сервис
-            </button>
-            <p className="text-white/40 text-sm">
-              Доступно даже за 15 минут до прибытия
+            <p className="text-xl text-white/70 leading-relaxed mb-3 max-w-lg">
+              Бережная доставка багажа без ограничений по весу — от вагона до автомобиля или выхода
             </p>
-          </div>
-        </div>
-
-        {/* Якорная стрелка вниз */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-30">
-          <div className="w-px h-12 bg-white" />
-          <Icon name="ChevronDown" size={16} className="text-white" />
-        </div>
-      </section>
-
-      {/* КЛЮЧЕВОЕ ОЩУЩЕНИЕ */}
-      <section className="bg-[#1A1A1A] py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
-            {[
-              { title: "Без суеты", sub: "Всё под контролем с первой секунды" },
-              { title: "Без ожиданий", sub: "Специалист уже на месте к вашему прибытию" },
-              { title: "Без лишних контактов", sub: "Один звонок — и всё организовано" },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="bg-[#1A1A1A] px-10 py-12 flex flex-col gap-3 group hover:bg-[#222] transition-colors"
-              >
-                <div className="w-1 h-8 bg-[#D62B2B] mb-2" />
-                <h3 className="text-2xl font-black text-white">{item.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{item.sub}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-16 text-center">
-            <p className="text-white/30 text-xs uppercase tracking-[0.3em]">
-              Всё уже организовано к вашему прибытию
+            <p className="text-[#E31E24] font-semibold text-sm mb-10 flex items-center gap-2">
+              <Icon name="Clock" size={14} className="text-[#E31E24]" />
+              Оформить можно за 15 минут до прибытия поезда
             </p>
-          </div>
-        </div>
-      </section>
 
-      {/* КАК ЭТО РАБОТАЕТ */}
-      <section id="how" className="py-28 bg-[#F8F6F3]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-8 bg-[#D62B2B]" />
-              <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Процесс</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Как это работает</h2>
-          </div>
-
-          <div className="space-y-0">
-            {STEPS.map((step, i) => (
-              <div
-                key={i}
-                className="group flex items-start gap-8 py-8 border-b border-[#E8E4DF] last:border-0 hover:pl-2 transition-all duration-300"
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={scrollToForm}
+                className="bg-[#E31E24] hover:bg-[#C01A1F] text-white font-black px-10 py-4 rounded-xl text-base tracking-wide transition-all duration-200 hover:scale-[1.03] shadow-[0_8px_32px_rgba(227,30,36,0.5)]"
               >
-                <span className="text-4xl font-black text-[#E8E4DF] group-hover:text-[#D62B2B]/20 transition-colors min-w-[56px]">
-                  {step.num}
-                </span>
-                <div className="flex-1 pt-1">
-                  <h3 className="text-lg font-bold text-[#1A1A1A] mb-1">{step.title}</h3>
-                  <p className="text-[#999] text-sm leading-relaxed">{step.desc}</p>
-                </div>
-                <Icon
-                  name="ArrowRight"
-                  size={16}
-                  className="text-[#E8E4DF] group-hover:text-[#D62B2B] mt-2 transition-colors flex-shrink-0"
-                />
+                Заказать сервис
+              </button>
+              <div className="flex items-center gap-3 bg-white/10 border border-white/20 backdrop-blur rounded-xl px-5 py-4">
+                <Icon name="ShieldCheck" size={20} className="text-[#E31E24]" />
+                <span className="text-white/80 text-sm font-medium">Полный возврат при отмене</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ПРЕМИАЛЬНЫЕ ПРЕИМУЩЕСТВА */}
-      <section id="benefits" className="py-28 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-8 bg-[#D62B2B]" />
-              <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Стандарт</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Премиальные<br />преимущества</h2>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {BENEFITS.map((b, i) => (
-              <div
-                key={i}
-                className="group p-8 border border-[#E8E4DF] rounded-2xl hover:border-[#D62B2B]/30 hover:shadow-lg transition-all duration-300 bg-[#F8F6F3]"
-              >
-                <div className="flex items-start gap-5">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-[#E8E4DF] flex items-center justify-center flex-shrink-0 group-hover:border-[#D62B2B]/30 group-hover:bg-[#D62B2B]/5 transition-all">
-                    <Icon name={b.icon} size={18} className="text-[#D62B2B]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1A1A1A] mb-1.5">{b.title}</h3>
-                    <p className="text-sm text-[#888] leading-relaxed">{b.desc}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ДЛЯ КОГО */}
-      <section className="py-20 bg-[#1A1A1A]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-8 bg-[#D62B2B]" />
-              <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Аудитория</span>
-            </div>
-            <h2 className="text-3xl font-black text-white">Для кого этот сервис</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {AUDIENCES.map((a, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center text-center gap-3 py-8 px-4 border border-white/10 rounded-2xl hover:border-[#D62B2B]/40 hover:bg-white/5 transition-all duration-300"
-              >
-                <div className="w-10 h-10 rounded-full bg-[#D62B2B]/10 flex items-center justify-center">
-                  <Icon name={a.icon} size={18} className="text-[#D62B2B]" />
-                </div>
-                <p className="text-white/70 text-sm font-medium leading-snug">{a.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ДОВЕРИЕ */}
-      <section className="py-20 bg-[#F8F6F3] border-y border-[#E8E4DF]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-            <div className="max-w-lg">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-px w-8 bg-[#D62B2B]" />
-                <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Гарантии</span>
-              </div>
-              <h2 className="text-3xl font-black tracking-tight mb-4">Доверие и статус</h2>
-              <p className="text-[#666] leading-relaxed text-sm">
-                Сервис реализован с учётом стандартов РЖД. Сотрудники проходят профессиональную подготовку и работают по утверждённому регламенту.
-              </p>
-            </div>
-            <div className="flex flex-col gap-4 min-w-[260px]">
+            <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2">
               {[
-                { icon: "ShieldCheck", text: "Надёжность и безопасность" },
-                { icon: "Lock", text: "Полная конфиденциальность" },
-                { icon: "Award", text: "Стандарты РЖД" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E4DF] flex items-center justify-center flex-shrink-0">
-                    <Icon name={item.icon} size={14} className="text-[#D62B2B]" />
-                  </div>
-                  <span className="text-sm text-[#555] font-medium">{item.text}</span>
-                </div>
+                "✓ Без ограничений по весу",
+                "✓ Мгновенное назначение",
+                "✓ Возврат за 15 минут",
+              ].map((t) => (
+                <span key={t} className="text-white/50 text-sm">{t}</span>
               ))}
             </div>
           </div>
         </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-[#E31E24] via-[#C8A96E] to-[#E31E24] opacity-70" />
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-28 bg-white">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-8 bg-[#D62B2B]" />
-              <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Вопросы</span>
+      {/* ═══ КАК РАБОТАЕТ ═══ */}
+      <section id="how" className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-center gap-4 mb-16">
+            <div className="w-1 h-14 bg-[#E31E24]" />
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#E31E24] font-bold mb-1">Простой процесс</p>
+              <h2 className="text-4xl font-black tracking-tight">Как это работает</h2>
             </div>
-            <h2 className="text-4xl font-black tracking-tight">Ответы на<br />частые вопросы</h2>
           </div>
-          <div className="space-y-2">
-            {FAQS.map((faq, i) => (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
+            {STEPS.map((step, i) => (
+              <div key={i} className="group">
+                <div className="flex flex-col items-start lg:items-center text-left lg:text-center gap-4">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full bg-[#F5F3EF] border-2 border-[#E8E4DF] flex items-center justify-center group-hover:border-[#E31E24] group-hover:bg-[#E31E24]/5 transition-all duration-300">
+                      <Icon name={step.icon} size={28} className="text-[#E31E24]" />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-[#E31E24] rounded-full flex items-center justify-center">
+                      <span className="text-white text-[10px] font-black">{i + 1}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#1A1A1A] mb-2 text-sm">{step.title}</h3>
+                    <p className="text-[#888] text-xs leading-relaxed">{step.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14 text-center">
+            <button
+              onClick={scrollToForm}
+              className="inline-flex items-center gap-3 bg-[#1A1A1A] hover:bg-[#333] text-white font-bold px-10 py-4 rounded-xl text-base transition-all duration-200 hover:scale-[1.02]"
+            >
+              <span>Оформить заявку сейчас</span>
+              <Icon name="ArrowRight" size={18} className="text-white" />
+            </button>
+            <p className="text-[#AAA] text-xs mt-3">Займёт меньше 2 минут</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ПРЕИМУЩЕСТВА ═══ */}
+      <section id="benefits" className="py-24 bg-[#1A1A1A]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex items-center gap-4 mb-16">
+            <div className="w-1 h-14 bg-[#E31E24]" />
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#E31E24] font-bold mb-1">Наши условия</p>
+              <h2 className="text-4xl font-black tracking-tight text-white">Почему выбирают нас</h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {BENEFITS.map((b, i) => (
               <div
                 key={i}
-                className="border border-[#E8E4DF] rounded-xl overflow-hidden"
+                className="group relative bg-[#222] border border-white/5 rounded-2xl p-8 hover:border-[#E31E24]/30 transition-all duration-300 overflow-hidden"
               >
-                <button
-                  className="w-full flex items-center justify-between px-6 py-5 text-left text-[#1A1A1A] hover:bg-[#F8F6F3] transition-colors group"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="font-semibold text-sm pr-4">{faq.q}</span>
-                  <Icon
-                    name={openFaq === i ? "Minus" : "Plus"}
-                    size={16}
-                    className={`flex-shrink-0 transition-colors ${openFaq === i ? "text-[#D62B2B]" : "text-[#CCC]"}`}
-                  />
-                </button>
-                {openFaq === i && (
-                  <div className="px-6 pb-5 pt-0 text-[#777] text-sm leading-relaxed bg-[#F8F6F3] border-t border-[#E8E4DF]">
-                    {faq.a}
+                <div className="absolute top-0 right-0 w-16 h-16 bg-[#E31E24]/10 rounded-bl-3xl" />
+                <div className="flex items-start gap-5">
+                  <div className="w-12 h-12 bg-[#E31E24]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#E31E24]/20 transition-colors">
+                    <Icon name={b.icon} size={22} className="text-[#E31E24]" />
                   </div>
-                )}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-bold text-white">{b.title}</h3>
+                      <span className="text-[10px] bg-[#E31E24]/20 text-[#E31E24] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        {b.tag}
+                      </span>
+                    </div>
+                    <p className="text-[#888] text-sm leading-relaxed">{b.desc}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ФИНАЛЬНЫЙ БЛОК */}
-      <section id="order-form" className="py-32 bg-[#1A1A1A] relative overflow-hidden">
-        {/* Декоративный красный акцент */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D62B2B] to-transparent opacity-60" />
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#D62B2B]/5 rounded-full blur-3xl" />
-
-        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="h-px w-8 bg-[#D62B2B]" />
-            <span className="text-xs uppercase tracking-[0.2em] text-[#D62B2B]">Начало</span>
-            <div className="h-px w-8 bg-[#D62B2B]" />
+      {/* ═══ ДОВЕРИЕ ═══ */}
+      <section className="py-14 bg-[#F5F3EF] border-y border-[#E8E4DF]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {TRUST_ITEMS.map((item, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white border border-[#E8E4DF] flex items-center justify-center flex-shrink-0">
+                  <Icon name={item.icon} size={18} className="text-[#E31E24]" />
+                </div>
+                <p className="text-[#555] text-sm font-medium leading-snug">{item.text}</p>
+              </div>
+            ))}
           </div>
-
-          <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight mb-6">
-            Комфорт начинается<br />
-            <span className="text-[#D62B2B]">с деталей</span>
-          </h2>
-
-          <p className="text-white/50 text-lg mb-4 leading-relaxed">
-            Доверьте багаж профессионалам
-          </p>
-          <p className="text-white/30 text-base mb-12">
-            И сосредоточьтесь на поездке
-          </p>
-
-          <button
-            onClick={scrollToForm}
-            className="inline-flex items-center gap-3 bg-[#D62B2B] hover:bg-[#b71c1c] text-white font-bold px-12 py-5 rounded-xl text-base tracking-wide transition-all duration-300 hover:scale-[1.03] shadow-[0_8px_40px_rgba(214,43,43,0.35)] mb-6"
-          >
-            <span>Оформить сервис</span>
-            <Icon name="ArrowRight" size={18} className="text-white" />
-          </button>
-
-          <p className="text-white/25 text-xs tracking-[0.15em] uppercase">
-            Быстро · Конфиденциально · Без лишних действий
-          </p>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-[#111] py-10 border-t border-white/5">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-[#D62B2B] rounded flex items-center justify-center">
-              <Icon name="Luggage" size={12} className="text-white" />
+      {/* ═══ ФОРМА ═══ */}
+      <section id="order-form" className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+
+            {/* Левая — текст */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-1 h-14 bg-[#E31E24]" />
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#E31E24] font-bold mb-1">Заявка</p>
+                  <h2 className="text-4xl font-black tracking-tight leading-tight">Оформить<br />сервис</h2>
+                </div>
+              </div>
+
+              <p className="text-[#666] mb-8 leading-relaxed">
+                Заполните форму — специалист будет назначен автоматически. Никаких звонков и ожиданий.
+              </p>
+
+              <div className="space-y-4 mb-10">
+                {[
+                  { icon: "Zap", text: "Мгновенное назначение носильщика" },
+                  { icon: "Clock", text: "Можно оформить за 15 минут до прибытия" },
+                  { icon: "RotateCcw", text: "Полный возврат в течение 15 минут" },
+                  { icon: "Infinity", text: "Любой вес и количество мест" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#E31E24]/8 flex items-center justify-center flex-shrink-0">
+                      <Icon name={item.icon} size={14} className="text-[#E31E24]" />
+                    </div>
+                    <span className="text-[#555] text-sm">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-5 bg-[#F5F3EF] border-l-4 border-[#C8A96E] rounded-r-xl">
+                <p className="text-[#555] text-sm leading-relaxed italic">
+                  «Сервис реализован в соответствии со стандартами РЖД. Персонал проходит подготовку и работает по регламенту.»
+                </p>
+              </div>
             </div>
-            <span className="text-white/60 text-sm font-medium">
-              РЖД<span className="text-[#D62B2B]"> Сопровождение</span>
-            </span>
+
+            {/* Правая — форма */}
+            <div className="lg:col-span-3">
+              {success ? (
+                <div className="bg-[#F5F3EF] border border-[#E8E4DF] rounded-2xl p-12 text-center">
+                  <div className="w-20 h-20 bg-[#E31E24]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon name="CheckCircle" size={40} className="text-[#E31E24]" />
+                  </div>
+                  <h3 className="text-2xl font-black mb-3">Заявка принята!</h3>
+                  {orderId && (
+                    <p className="text-[#E31E24] font-bold mb-3">Номер заявки: №{orderId}</p>
+                  )}
+                  <p className="text-[#666] leading-relaxed max-w-sm mx-auto">
+                    Носильщик назначен автоматически. Вы получите SMS с именем и фото специалиста.
+                  </p>
+                </div>
+              ) : (
+                <form
+                  onSubmit={handleSubmit}
+                  className="bg-[#F5F3EF] border border-[#E8E4DF] rounded-2xl p-8"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>
+                        ФИО <span className="text-[#E31E24]">*</span>
+                      </label>
+                      <input
+                        name="full_name"
+                        value={form.full_name}
+                        onChange={handleChange}
+                        placeholder="Иванов Иван Иванович"
+                        className={inputCls}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>
+                        Телефон <span className="text-[#E31E24]">*</span>
+                      </label>
+                      <input
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        placeholder="+7 900 000 00 00"
+                        className={inputCls}
+                        type="tel"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>Email</label>
+                      <input
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        placeholder="ivan@example.com"
+                        className={inputCls}
+                        type="email"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>
+                        Станция прибытия <span className="text-[#E31E24]">*</span>
+                      </label>
+                      <select
+                        name="station"
+                        value={form.station}
+                        onChange={handleChange}
+                        className={inputCls}
+                        required
+                      >
+                        <option value="">Выберите вокзал</option>
+                        {STATIONS.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>Номер поезда</label>
+                      <input
+                        name="train_number"
+                        value={form.train_number}
+                        onChange={handleChange}
+                        placeholder="002А"
+                        className={inputCls}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>Время прибытия</label>
+                      <input
+                        name="arrival_time"
+                        value={form.arrival_time}
+                        onChange={handleChange}
+                        className={inputCls}
+                        type="datetime-local"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>Количество мест багажа</label>
+                      <select
+                        name="bags_count"
+                        value={form.bags_count}
+                        onChange={handleChange}
+                        className={inputCls}
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                          <option key={n} value={n}>
+                            {n} {n === 1 ? "место" : n < 5 ? "места" : "мест"}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={labelCls}>Примечания</label>
+                      <input
+                        name="notes"
+                        value={form.notes}
+                        onChange={handleChange}
+                        placeholder="Крупногабаритный груз, коляска..."
+                        className={inputCls}
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="mb-5 flex items-center gap-2 text-[#E31E24] bg-[#E31E24]/8 border border-[#E31E24]/20 rounded-lg px-4 py-3 text-sm">
+                      <Icon name="AlertCircle" size={16} className="text-[#E31E24] flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#E31E24] hover:bg-[#C01A1F] disabled:opacity-60 text-white font-black py-4 rounded-xl text-base tracking-wide transition-all duration-200 hover:scale-[1.01] shadow-[0_6px_24px_rgba(227,30,36,0.35)] flex items-center justify-center gap-3"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Отправляем...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="Send" size={18} className="text-white" />
+                        <span>Оформить заявку</span>
+                      </>
+                    )}
+                  </button>
+
+                  <p className="text-center text-xs text-[#AAA] mt-4">
+                    Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+                  </p>
+                </form>
+              )}
+            </div>
           </div>
-          <p className="text-white/20 text-xs text-center">
-            © 2024 · Сервис персонального сопровождения багажа
+        </div>
+      </section>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="bg-[#1A1A1A] py-10 border-t-2 border-[#E31E24]">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#E31E24] rounded flex items-center justify-center">
+              <span className="text-white font-black text-[10px]">РЖД</span>
+            </div>
+            <span className="text-white/70 text-sm font-medium">Сервис сопровождения багажа</span>
+          </div>
+          <p className="text-white/25 text-xs text-center">
+            © 2024 · Персональный сервис сопровождения · Соответствует стандартам РЖД
           </p>
           <button
             onClick={scrollToForm}
-            className="text-[#D62B2B] text-xs font-medium border border-[#D62B2B]/30 px-4 py-2 rounded-lg hover:border-[#D62B2B] transition-all"
+            className="text-[#E31E24] text-xs font-bold border border-[#E31E24]/40 px-4 py-2 rounded-lg hover:border-[#E31E24] hover:bg-[#E31E24]/10 transition-all"
           >
-            Заказать сервис
+            Заказать →
           </button>
         </div>
       </footer>

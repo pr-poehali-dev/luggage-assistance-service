@@ -1,0 +1,37 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Create order success",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "full_name": "Иванов Иван Иванович",
+        "phone": "+7 900 000 00 00",
+        "email": "test@example.com",
+        "train_number": "002А",
+        "arrival_time": "2026-05-01T14:30:00",
+        "station": "Москва Казанская",
+        "bags_count": 2,
+        "notes": "Тестовая заявка"
+      },
+      "expectedStatus": 200
+    },
+    {
+      "name": "Create order missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "full_name": "",
+        "phone": "",
+        "station": ""
+      },
+      "expectedStatus": 400
+    }
+  ]
+}
