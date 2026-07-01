@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 
 const HERO_IMAGE =
@@ -85,6 +86,7 @@ const TRUST_ITEMS = [
 ];
 
 export default function Index() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -158,10 +160,24 @@ export default function Index() {
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#555]">
-            <a href="#how" className="hover:text-[#E31E24] transition-colors">Как работает</a>
-            <a href="#benefits" className="hover:text-[#E31E24] transition-colors">Преимущества</a>
-            <a href="#order-form" className="hover:text-[#E31E24] transition-colors">Заказать</a>
+          <div className="hidden md:flex items-center gap-6">
+            <div className="flex items-center gap-2 bg-[#E31E24]/10 border border-[#E31E24]/30 px-3 py-1.5 rounded-lg">
+              <span className="text-base">🚆</span>
+              <span className="text-sm font-bold text-[#E31E24]">РЖД / Вокзал</span>
+            </div>
+            <button
+              onClick={() => navigate("/airport")}
+              className="text-sm text-[#888] hover:text-[#C8A96E] transition-colors flex items-center gap-1.5"
+            >
+              <span>✈️</span>
+              <span>Переключить на Аэропорт</span>
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="text-sm text-[#AAA] hover:text-[#555] transition-colors"
+            >
+              ← Главная
+            </button>
           </div>
 
           <button
@@ -367,10 +383,22 @@ export default function Index() {
                 ))}
               </div>
 
-              <div className="p-5 bg-[#F5F3EF] border-l-4 border-[#C8A96E] rounded-r-xl">
+              <div className="p-5 bg-[#F5F3EF] border-l-4 border-[#C8A96E] rounded-r-xl mb-5">
                 <p className="text-[#555] text-sm leading-relaxed italic">
                   «Сервис реализован в соответствии со стандартами РЖД. Персонал проходит подготовку и работает по регламенту.»
                 </p>
+              </div>
+
+              {/* Переключение на Аэропорт */}
+              <div className="p-4 bg-[#0D1A2D]/5 border border-[#0D1A2D]/10 rounded-xl">
+                <p className="text-[#888] text-xs mb-3">Летите самолётом?</p>
+                <button
+                  onClick={() => navigate("/airport")}
+                  className="flex items-center gap-2 text-[#C8A96E] text-sm font-bold hover:underline"
+                >
+                  <span>✈️</span>
+                  <span>Перейти на сервис Аэропорт →</span>
+                </button>
               </div>
             </div>
 
@@ -551,12 +579,20 @@ export default function Index() {
           <p className="text-white/25 text-xs text-center">
             © 2024 · Персональный сервис сопровождения · Соответствует стандартам РЖД
           </p>
-          <button
-            onClick={scrollToForm}
-            className="text-[#E31E24] text-xs font-bold border border-[#E31E24]/40 px-4 py-2 rounded-lg hover:border-[#E31E24] hover:bg-[#E31E24]/10 transition-all"
-          >
-            Заказать →
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/")}
+              className="text-white/40 text-xs border border-white/10 px-3 py-1.5 rounded hover:border-white/30 transition-all"
+            >
+              ← Главная
+            </button>
+            <button
+              onClick={() => navigate("/airport")}
+              className="text-white/40 text-xs border border-white/10 px-3 py-1.5 rounded hover:border-[#C8A96E]/40 hover:text-[#C8A96E] transition-all"
+            >
+              ✈️ Аэропорт
+            </button>
+          </div>
         </div>
       </footer>
     </div>
