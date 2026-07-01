@@ -148,24 +148,15 @@ export default function Airport() {
 
       {/* HERO */}
       <section className="relative min-h-[85vh] flex flex-col justify-center pt-16 overflow-hidden bg-[#0D1A2D]">
-        {/* Абстрактный фон аэропорта */}
+        {/* Фото носильщика с самолётом */}
         <div
-          className="absolute inset-0 opacity-20 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80")`,
+            backgroundImage: `url("https://cdn.poehali.dev/projects/6038a985-0abf-4169-a538-8b944a6b2559/files/ed047295-fb1a-4515-b3af-ff32abda2156.jpg")`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0D1A2D]/95 via-[#0D1A2D]/85 to-[#1A2D1A]/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0D1A2D]/90 via-[#0D1A2D]/70 to-[#0D1A2D]/30" />
         <div className="absolute top-16 left-0 right-0 h-1 bg-[#C8A96E] z-10" />
-
-        {/* Декоративная сетка */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(200,169,110,1) 1px, transparent 1px), linear-gradient(90deg, rgba(200,169,110,1) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
-          }}
-        />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
           <div className="max-w-2xl">
