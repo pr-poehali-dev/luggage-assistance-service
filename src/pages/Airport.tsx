@@ -321,8 +321,93 @@ export default function Airport() {
       </section>
 
       {/* ФОРМА */}
-      <section id="order-form" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="order-form" className={`py-24 relative overflow-hidden transition-colors duration-1000 ${success ? "bg-[#0D1A2D]" : "bg-white"}`}>
+
+        {/* Самолёт — появляется после успешной отправки */}
+        {success && (
+          <>
+            {/* Звёздное небо */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0D1A2D] via-[#0A1520] to-[#06100D]" />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {[...Array(40)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute rounded-full bg-white"
+                  style={{
+                    width: Math.random() > 0.7 ? "2px" : "1px",
+                    height: Math.random() > 0.7 ? "2px" : "1px",
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    opacity: Math.random() * 0.6 + 0.1,
+                    animation: `pulse ${2 + Math.random() * 3}s ease-in-out infinite`,
+                    animationDelay: `${Math.random() * 3}s`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Самолёт, летящий по диагонали */}
+            <div
+              className="absolute pointer-events-none z-0"
+              style={{
+                animation: "plane-fly 8s ease-in-out infinite",
+                bottom: "15%",
+                left: "-10%",
+              }}
+            >
+              <div style={{ transform: "rotate(-15deg)" }}>
+                <svg width="180" height="80" viewBox="0 0 180 80" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.12 }}>
+                  {/* Фюзеляж */}
+                  <ellipse cx="90" cy="40" rx="78" ry="10" fill="white"/>
+                  {/* Нос */}
+                  <path d="M168 40 Q180 40 175 36 L168 33 Z" fill="white"/>
+                  {/* Хвост */}
+                  <path d="M12 40 Q4 38 6 32 L20 35 Z" fill="white"/>
+                  {/* Крылья */}
+                  <path d="M80 40 L110 12 L120 14 L100 40 Z" fill="white"/>
+                  <path d="M80 40 L110 68 L120 66 L100 40 Z" fill="white"/>
+                  {/* Малые крылья хвоста */}
+                  <path d="M22 38 L36 28 L40 30 L30 40 Z" fill="white"/>
+                  <path d="M22 42 L36 52 L40 50 L30 40 Z" fill="white"/>
+                  {/* Иллюминаторы */}
+                  <circle cx="120" cy="37" r="3" fill="#0D1A2D" opacity="0.5"/>
+                  <circle cx="133" cy="37" r="3" fill="#0D1A2D" opacity="0.5"/>
+                  <circle cx="146" cy="37" r="3" fill="#0D1A2D" opacity="0.5"/>
+                </svg>
+              </div>
+            </div>
+
+            {/* Инверсионный след */}
+            <div
+              className="absolute pointer-events-none z-0"
+              style={{
+                animation: "plane-fly 8s ease-in-out infinite",
+                bottom: "calc(15% + 8px)",
+                left: "-20%",
+                width: "300px",
+                height: "2px",
+                background: "linear-gradient(to right, transparent, rgba(200,169,110,0.15), transparent)",
+              }}
+            />
+
+            {/* Золотая луна */}
+            <div className="absolute top-12 right-16 w-20 h-20 rounded-full bg-gradient-to-br from-[#C8A96E]/20 to-[#C8A96E]/5 border border-[#C8A96E]/15 pointer-events-none" />
+            <div className="absolute top-10 right-14 w-16 h-16 rounded-full bg-[#0D1A2D]/80 pointer-events-none" style={{ transform: "translate(30%, -15%)" }} />
+
+            <style>{`
+              @keyframes plane-fly {
+                0%   { transform: translateX(0) translateY(0); }
+                50%  { transform: translateX(110vw) translateY(-80px); }
+                50.1%{ transform: translateX(-20%) translateY(0); opacity: 0; }
+                51%  { opacity: 0; }
+                55%  { opacity: 1; transform: translateX(-10%) translateY(0); }
+                100% { transform: translateX(0) translateY(0); }
+              }
+            `}</style>
+          </>
+        )}
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
 
             {/* Левая — текст */}
@@ -331,11 +416,11 @@ export default function Airport() {
                 <div className="w-1 h-14 bg-[#C8A96E]" />
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-[#C8A96E] font-bold mb-1">Заявка</p>
-                  <h2 className="text-4xl font-black tracking-tight leading-tight">Заказать<br />встречу</h2>
+                  <h2 className={`text-4xl font-black tracking-tight leading-tight transition-colors duration-700 ${success ? "text-white" : "text-[#1A1A1A]"}`}>Заказать<br />встречу</h2>
                 </div>
               </div>
 
-              <p className="text-[#666] mb-8 leading-relaxed">
+              <p className={`mb-8 leading-relaxed transition-colors duration-700 ${success ? "text-white/50" : "text-[#666]"}`}>
                 Заполните форму — специалист будет назначен автоматически и встретит вас в указанной точке.
               </p>
 
@@ -350,7 +435,7 @@ export default function Airport() {
                     <div className="w-8 h-8 rounded-lg bg-[#C8A96E]/10 flex items-center justify-center flex-shrink-0">
                       <Icon name={item.icon} size={14} className="text-[#C8A96E]" />
                     </div>
-                    <span className="text-[#555] text-sm">{item.text}</span>
+                    <span className={`text-sm transition-colors duration-700 ${success ? "text-white/50" : "text-[#555]"}`}>{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -371,17 +456,21 @@ export default function Airport() {
             {/* Правая — форма */}
             <div className="lg:col-span-3">
               {success ? (
-                <div className="bg-[#F5F3EF] border border-[#E8E4DF] rounded-2xl p-12 text-center">
-                  <div className="w-20 h-20 bg-[#C8A96E]/15 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="bg-white/5 border border-[#C8A96E]/20 rounded-2xl p-12 text-center backdrop-blur-sm">
+                  <div className="w-20 h-20 bg-[#C8A96E]/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#C8A96E]/20">
                     <Icon name="CheckCircle" size={40} className="text-[#C8A96E]" />
                   </div>
-                  <h3 className="text-2xl font-black mb-3">Заявка принята!</h3>
+                  <h3 className="text-2xl font-black mb-3 text-white">Заявка принята!</h3>
                   {orderId && (
                     <p className="text-[#C8A96E] font-bold mb-3">Номер заявки: №{orderId}</p>
                   )}
-                  <p className="text-[#666] leading-relaxed max-w-sm mx-auto">
+                  <p className="text-white/50 leading-relaxed max-w-sm mx-auto">
                     Специалист назначен автоматически. Вы получите SMS с именем и точкой встречи.
                   </p>
+                  <div className="mt-8 flex items-center justify-center gap-2 text-white/20 text-xs">
+                    <div className="w-1.5 h-1.5 bg-[#C8A96E] rounded-full animate-pulse" />
+                    Приятного полёта
+                  </div>
                 </div>
               ) : (
                 <form
