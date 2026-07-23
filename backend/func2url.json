@@ -1,4 +1,7 @@
 {
+  "partner-clients": "https://functions.poehali.dev/a73a96d9-c4ca-4190-8250-adccc6ea3721",
+  "partner-orders": "https://functions.poehali.dev/b7d0c948-8c42-495c-a2ca-e18cc7ea02cb",
+  "partner-auth": "https://functions.poehali.dev/87503926-d030-4509-b7ce-7d101b58eb0c",
   "client-dashboard": "https://functions.poehali.dev/8d66de6b-61b1-4865-98a8-33f30548887c",
   "create-order": "https://functions.poehali.dev/0f179400-dd22-4d3a-935b-04e356fd1bb5"
 }

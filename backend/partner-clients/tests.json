@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "GET missing partner_id",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400
+    },
+    {
+      "name": "POST create_client missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "create_client"},
+      "expectedStatus": 400
+    }
+  ]
+}

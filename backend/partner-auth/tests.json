@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Login missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login"},
+      "expectedStatus": 400
+    },
+    {
+      "name": "Login wrong credentials",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "email": "nouser@test.com", "password": "wrong"},
+      "expectedStatus": 401
+    }
+  ]
+}

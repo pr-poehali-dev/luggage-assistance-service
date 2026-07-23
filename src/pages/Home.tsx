@@ -302,6 +302,7 @@ export default function Home() {
             <button onClick={() => navigate("/railway")} className="text-white/30 text-xs border border-white/8 px-3 py-1.5 rounded-lg hover:border-[#E31E24]/40 hover:text-[#E31E24] transition-all">🚆 РЖД</button>
             <button onClick={() => navigate("/airport")} className="text-white/30 text-xs border border-white/8 px-3 py-1.5 rounded-lg hover:border-[#C8A96E]/40 hover:text-[#C8A96E] transition-all">✈️ Аэропорт</button>
             <button onClick={() => navigate("/dashboard")} className="text-white/30 text-xs border border-white/8 px-3 py-1.5 rounded-lg hover:border-white/20 hover:text-white transition-all">👤 Кабинет</button>
+            <button onClick={() => navigate("/partner/login")} className="text-white/30 text-xs border border-white/8 px-3 py-1.5 rounded-lg hover:border-white/20 hover:text-white transition-all">🏢 Для партнёров</button>
           </div>
         </div>
       </footer>
